@@ -9,7 +9,7 @@ namespace mindplay\sql\framework;
  * 
  * @see Connection::fetch()
  */
-interface ReturningExecutable extends Executable
+interface MappedExecutable extends Executable
 {
     /**
      * @return Mapper[] list of Mappers to apply while fetching returned records

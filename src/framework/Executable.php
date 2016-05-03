@@ -3,7 +3,7 @@
 namespace mindplay\sql\framework;
 
 /**
- * This interface defines the aspect of e.g. `Statement` that makes it "executable", in the
+ * This interface defines the aspect of e.g. `Query` that makes it "executable", in the
  * sense it can create or provide a fully-populated SQL string and params, ready for preparation.
  *
  * @see Connection::prepare()

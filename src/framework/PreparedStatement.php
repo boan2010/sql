@@ -20,7 +20,7 @@ interface PreparedStatement
     /**
      * Executes the underlying SQL statement.
      *
-     * @return void
+     * @return Status
      *
      * @throws SQLException on failure to execute the underlying SQL statement
      */

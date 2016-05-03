@@ -4,6 +4,7 @@ namespace mindplay\sql\framework;
 
 use InvalidArgumentException;
 use LogicException;
+use mindplay\sql\model\Column;
 use UnexpectedValueException;
 
 /**
@@ -16,20 +17,20 @@ interface Connection
      *
      * Note that you can directly iterate over the `Result` instance.
      *
-     * @param ReturningExecutable $statement
-     * @param int                 $batch_size batch-size (when fetching large result sets)
-     * @param Mapper[]            $mappers    list of additional Mappers to apply while fetching results
+     * @param MappedExecutable $statement
+     * @param int              $batch_size batch-size (when fetching large result sets)
+     * @param Mapper[]         $mappers    list of additional Mappers to apply while fetching results
      *
      * @return Result
      */
-    public function fetch(ReturningExecutable $statement, $batch_size = 1000, array $mappers = []);
+    public function fetch(MappedExecutable $statement, $batch_size = 1000, array $mappers = []);
 
     /**
      * Execute an SQL statement, which does not produce a result, e.g. an "INSERT", "UPDATE" or "DELETE" statement.
      *
      * @param Executable $statement
      *
-     * @return void
+     * @return Status
      */
     public function execute(Executable $statement);
 

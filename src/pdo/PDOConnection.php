@@ -7,8 +7,12 @@ use LogicException;
 use mindplay\sql\framework\Connection;
 use mindplay\sql\framework\Executable;
 use mindplay\sql\framework\Result;
-use mindplay\sql\framework\ReturningExecutable;
+use mindplay\sql\framework\MappedExecutable;
+use mindplay\sql\framework\SequencedExecutable;
+use mindplay\sql\framework\Status;
+use mindplay\sql\model\Column;
 use PDO;
+use PDOStatement;
 use UnexpectedValueException;
 
 /**
@@ -51,8 +55,16 @@ class PDOConnection implements Connection
         $params = $statement->getParams();
 
         $sql = $this->expandPlaceholders($statement->getSQL(), $params);
-
-        $prepared_statement = new PreparedPDOStatement($this->pdo->prepare($sql));
+        
+        $sequence_names = [];
+        
+        if ($statement instanceof SequencedExecutable) {
+            foreach ($statement->getSequencedColumns() as $column) {
+                $sequence_names[$column->getName()] = $column->getSequenceName();
+            }
+        }
+        
+        $prepared_statement = new PreparedPDOStatement($this->pdo, $this->pdo->prepare($sql), $sequence_names);
         
         foreach ($params as $name => $value) {
             if (is_array($value)) {
@@ -76,7 +88,7 @@ class PDOConnection implements Connection
     /**
      * @inheritdoc
      */
-    public function fetch(ReturningExecutable $statement, $batch_size = 1000, array $mappers = [])
+    public function fetch(MappedExecutable $statement, $batch_size = 1000, array $mappers = [])
     {
         return new Result(
             $this->prepare($statement),
@@ -90,7 +102,7 @@ class PDOConnection implements Connection
      */
     public function execute(Executable $statement)
     {
-        $this->prepare($statement)->execute();
+        return $this->prepare($statement)->execute();
     }
 
     /**

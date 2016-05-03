@@ -50,6 +50,11 @@ class Column
     private $auto;
 
     /**
+     * @var string|null
+     */
+    private $sequence_name;
+
+    /**
      * @param Driver      $driver
      * @param Table       $table parent Table instance
      * @param string      $name
@@ -58,8 +63,19 @@ class Column
      * @param bool        $required
      * @param mixed       $default
      * @param bool        $auto
+     * @param string|null $sequence_name
      */
-    public function __construct(Driver $driver, Table $table, $name, Type $type, $alias, $required, $default, $auto)
+    public function __construct(
+        Driver $driver,
+        Table $table,
+        $name,
+        Type $type,
+        $alias,
+        $required,
+        $default,
+        $auto,
+        $sequence_name
+    )
     {
         $this->table = $table;
         $this->driver = $driver;
@@ -69,6 +85,7 @@ class Column
         $this->required = $required;
         $this->default = $default;
         $this->auto = $auto;
+        $this->sequence_name = $sequence_name;
     }
 
     /**
@@ -125,6 +142,14 @@ class Column
     public function isAuto()
     {
         return $this->auto;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSequenceName()
+    {
+        return $this->sequence_name;
     }
 
     /**

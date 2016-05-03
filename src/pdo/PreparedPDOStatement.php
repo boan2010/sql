@@ -5,6 +5,7 @@ namespace mindplay\sql\pdo;
 use InvalidArgumentException;
 use mindplay\sql\framework\PreparedStatement;
 use mindplay\sql\framework\SQLException;
+use mindplay\sql\framework\Status;
 use PDO;
 use PDOStatement;
 
@@ -13,6 +14,11 @@ use PDOStatement;
  */
 class PreparedPDOStatement implements PreparedStatement
 {
+    /**
+     * @var PDO
+     */
+    private $pdo;
+
     /**
      * @var PDOStatement
      */
@@ -29,11 +35,20 @@ class PreparedPDOStatement implements PreparedStatement
     private $executed = false;
 
     /**
-     * @param PDOStatement $handle
+     * @var string[]
      */
-    public function __construct(PDOStatement $handle)
+    private $sequence_names;
+
+    /**
+     * @param PDO          $pdo
+     * @param PDOStatement $handle
+     * @param string[]     $sequence_names map where Column name => sequence name
+     */
+    public function __construct(PDO $pdo, PDOStatement $handle, array $sequence_names)
     {
+        $this->pdo = $pdo;
         $this->handle = $handle;
+        $this->sequence_names = $sequence_names;
     }
 
     /**
@@ -70,10 +85,23 @@ class PreparedPDOStatement implements PreparedStatement
             
             throw new SQLException($this->handle->queryString, $this->params, "{$error[0]}: {$error[2]}", $error[1]);
         }
-        
-        $this->executed = true;
-    }
 
+        $this->executed = true;
+
+        $keys = [];
+
+        foreach ($this->sequence_names as $column_name => $sequence_name) {
+            // NOTE: spooky action in the distance - the internal state of the PDO connection
+            // object gets internally updated as a side-effect of calling PDOStatement::execute().
+            //
+            // PDO is fucking lovely.
+
+            $keys[$column_name] = $this->pdo->lastInsertId($sequence_name);
+        }
+        
+        return new Status($this->handle->rowCount(), $keys);
+    }
+    
     /**
      * @inheritdoc
      */

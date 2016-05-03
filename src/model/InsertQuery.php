@@ -4,13 +4,14 @@ namespace mindplay\sql\model;
 
 use mindplay\sql\framework\Driver;
 use mindplay\sql\framework\Query;
+use mindplay\sql\framework\SequencedExecutable;
 use mindplay\sql\framework\TypeProvider;
 use RuntimeException;
 
 /**
  * This class represents an INSERT query.
  */
-class InsertQuery extends Query
+class InsertQuery extends Query implements SequencedExecutable
 {
     /**
      * @var Driver
@@ -26,6 +27,11 @@ class InsertQuery extends Query
      * @var mixed[][] list of record maps, where Column name => value
      */
     private $records = [];
+
+    /**
+     * @var Column[]
+     */
+    private $sequenced = [];
 
     /**
      * @param Driver                 $driver
@@ -72,6 +78,26 @@ class InsertQuery extends Query
             // append given single record:
             $this->records[] = $record;
         }
+    }
+
+    /**
+     * @param Column $column
+     * 
+     * @return $this
+     */
+    public function withSequenced(Column $column)
+    {
+        $this->sequenced[] = $column;
+        
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSequencedColumns()
+    {
+        return $this->sequenced;
     }
 
     /**

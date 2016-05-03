@@ -108,7 +108,7 @@ abstract class Table
      */
     protected function requiredColumn($name, $type, $alias = null, $default = null)
     {
-        return new Column($this->driver, $this, $name, $this->types->getType($type), $alias, true, $default, false);
+        return new Column($this->driver, $this, $name, $this->types->getType($type), $alias, true, $default, false, null);
     }
 
     /**
@@ -121,19 +121,20 @@ abstract class Table
      */
     protected function optionalColumn($name, $type, $alias = null, $default = null)
     {
-        return new Column($this->driver, $this, $name, $this->types->getType($type), $alias, false, $default, false);
+        return new Column($this->driver, $this, $name, $this->types->getType($type), $alias, false, $default, false, null);
     }
 
     /**
      * @param string      $name
      * @param string      $type Type class-name
      * @param string|null $alias
+     * @param string|null $sequence_name
      *
      * @return Column
      */
-    protected function autoColumn($name, $type, $alias = null)
+    protected function autoColumn($name, $type, $alias = null, $sequence_name = null)
     {
-        return new Column($this->driver, $this, $name, $this->types->getType($type), $alias, false, null, true);
+        return new Column($this->driver, $this, $name, $this->types->getType($type), $alias, false, null, true, $sequence_name);
     }
 
     /**
